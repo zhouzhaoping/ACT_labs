@@ -1,0 +1,7 @@
+src/csc
+
+lab1/convert
+
+exmaples/*.3addr*
+
+exmaples/*.gcc*

@@ -2,7 +2,8 @@
 
 C_SUBSET_COMPILER=../src/csc
 #TODO: set THREE_ADDR_TO_C_TRANSLATOR to your own converter
-THREE_ADDR_TO_C_TRANSLATOR=../3addr-to-c-converter/convert.py
+#THREE_ADDR_TO_C_TRANSLATOR=../3addr-to-c-converter/convert.py
+THREE_ADDR_TO_C_TRANSLATOR=../lab1/convert
 
 [ $# -ne 1 ] && { echo "Usage $0 PROGRAM" >&2; exit 1; }
 

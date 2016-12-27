@@ -1,3 +1,2 @@
 #!/usr/bin/env bash
-
-# Script to compile your source
+g++ translator.cc -o convert
