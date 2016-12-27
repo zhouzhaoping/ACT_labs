@@ -2,6 +2,6 @@ src/csc
 
 lab1/convert
 
-exmaples/*.3addr*
+examples/*.3addr*
 
-exmaples/*.gcc*
+examples/*.gcc*
