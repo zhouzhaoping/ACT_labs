@@ -10,8 +10,8 @@ public class act_main
 
 	public static void main(String[] args)throws Exception {		
 			// Parse CommandLine Arguments
-			final Scanner r = new Scanner(new File(args[0]));
-			//final Scanner r = new Scanner(System.in);
+			//final Scanner r = new Scanner(new File(args[0]));
+			final Scanner r = new Scanner(System.in);
 			final Writer w = new PrintWriter(System.out);
 			
 			cmdlist = read(r);
