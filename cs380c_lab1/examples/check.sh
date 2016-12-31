@@ -7,3 +7,6 @@ do
 done
 echo "md5sum hash of outputs"
 md5sum *.txt
+
+rm *.gcc*
+rm *.3addr*
