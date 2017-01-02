@@ -1,0 +1,5 @@
+lab2/CFG_gen
+
+examples/*.3addr*
+
+examples/*.gcc*

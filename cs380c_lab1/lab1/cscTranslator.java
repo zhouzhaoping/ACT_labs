@@ -164,7 +164,7 @@ public class cscTranslator
 					else
 						cmds.put(numline + 0.5f, "else\n\t{");
 					
-					Float newkey = Float.parseFloat(line[1].substring(1, line[1].length() - 1)) + 0.5f;
+					Float newkey = Float.parseFloat(line[1].substring(1, line[1].length() - 1)) - 0.5f;// fix
 					if(cmds.containsKey(newkey))
 						cmds.put(newkey, cmds.get(newkey) + "\n}");
 					else
@@ -517,6 +517,13 @@ public class cscTranslator
 			output.append("\n");
 		}	
 		output.append("}\n");
+		
+		// debug
+//		Set<Float> keys = cmds.keySet();
+//	    for (Float key : keys){
+//	        System.out.println(key + " : " + cmds.get(key));
+//	    }
+//	    
 		return output.toString();
 	}
 	private static String getStructDeclaration(String structname, HashMap<String, TreeMap<Integer,String>> structs, HashMap<String, Integer> structSize, int size)
@@ -588,4 +595,3 @@ public class cscTranslator
 		}
 	}
 }
-

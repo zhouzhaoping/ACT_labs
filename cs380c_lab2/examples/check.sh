@@ -7,5 +7,5 @@ for PROGRAM in collatz.c gcd.c hanoifibfac.c loop.c mmm.c prime.c \
 do
     ./check-one-cfg.sh ${PROGRAM}
 done
-echo "md5sum hash of outputs"
-md5sum *.cfg
+#echo "md5sum hash of outputs"
+#md5sum *.cfg
