@@ -43,6 +43,7 @@ public:
 	void addCode(Code3addr c3a);
 	void addEdge(int from, int to);
 	void genCFG();
+	void genSCR();
 	void setEnd(int n) { funEndLineNumber = n; };
 	void printCFG();
 	void print();
@@ -56,5 +57,6 @@ private:
 public:
 	CFG() {};
 	void initCFG(istream &is);
-	void print();
+	void genSCR();
+	void printCFG();
 };

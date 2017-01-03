@@ -1,4 +1,5 @@
 #include "CFG.h"
+#include "Graph.h"
 #include <string>
 #include <list>
 #include <string.h>
@@ -138,6 +139,46 @@ void Function::printCFG()
 	cout << lastBlock << " ->" << endl;
 }
 
+vector<vector<int> > Graph::result = vector<vector<int> >();
+
+void Function::genSCR()
+{
+	Graph g(block.size());
+	map<int, int> block2node;
+	map<int, int> node2block;
+	int count = 0;
+	for (set<int>::iterator i = block.begin(); i != block.end(); ++i, ++count)
+	{
+		block2node[*i] = count;
+		node2block[count] = *i;
+		//cout << count << ":" << *i << endl;
+	}
+	for (map<int, vector<int> >::iterator i = edges.begin(); i != edges.end(); ++i)
+	{
+		int from = block2node[i->first];
+		for (vector<int>::iterator j = i->second.begin(); j != i->second.end(); ++j)
+		{
+			g.addEdge(from, block2node[*j]);
+			//cout << "add edge: " << i->first << "->" << *j << endl;
+		}
+	}
+
+	g.getStrongConnected();
+	cout << "SCR:" << endl;
+	for (vector<vector<int> >::iterator i = Graph::result.begin(); i != Graph::result.end(); ++i)
+	{
+		if (i->size() > 1)
+		{
+			sort(i->begin(), i->end(), less<int>());
+			for (vector<int>::iterator j = i->begin(); j != i->end(); ++j)
+			{
+				cout << node2block[*j] << " ";
+			}
+			cout << endl;
+		}
+	}
+}
+
 void CFG::initCFG(istream &is)
 {
 	string buf;
@@ -167,11 +208,20 @@ void CFG::initCFG(istream &is)
 	}
 }
 
-void CFG::print()
+void CFG::printCFG()
 {
 	for (map<int, Function>::iterator it = functions.begin(); it != functions.end(); ++it)
 	{
 		it->second.printCFG();
+	}
+}
+
+void CFG::genSCR()
+{
+	for (map<int, Function>::iterator it = functions.begin(); it != functions.end(); ++it)
+	{
+		it->second.printCFG();
+		it->second.genSCR();
 	}
 }
 
