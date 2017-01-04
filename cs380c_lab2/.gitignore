@@ -1,5 +1,9 @@
 lab2/CFG_gen
 
+lab2/SCR_gen
+
+lab2/csc
+
 examples/*.3addr*
 
 examples/*.gcc*
