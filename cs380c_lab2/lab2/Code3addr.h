@@ -1,6 +1,7 @@
 #pragma once
 #include <string>
 #include <vector>
+#include <set>
 using namespace std;
 
 class Code3addr
@@ -12,6 +13,10 @@ private:
 	bool isfunctionhead;
 	bool isfunctiontail;
 	int branch, call;
+
+	bool isblockhead, isblocktail;
+	string def;
+	set<string> use;
 public:
 	Code3addr() {};
 	Code3addr(string str);
@@ -23,4 +28,11 @@ public:
 	int getBranch() { return branch; };
 	int getCall() { return call; };
 	vector<string> getCodesplit() { return codesplit; };
+
+	void setBlockHead() { isblockhead = true; };
+	void setBlockTail() { isblocktail = true; };
+	bool isBlockHead() { return isblockhead; };
+	bool isBlockTail() { return isblocktail; };
+	string getDef() { return def; };
+	set<string> getUse() { return use; };
 };

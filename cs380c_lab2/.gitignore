@@ -4,6 +4,8 @@ lab2/SCR_gen
 
 lab2/csc
 
+lab2/cfg_scp*
+
 examples/*.3addr*
 
 examples/*.gcc*

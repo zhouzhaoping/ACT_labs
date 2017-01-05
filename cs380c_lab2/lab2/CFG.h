@@ -7,6 +7,7 @@ using namespace std;
 class CFG
 {
 private:
+	int mainFun;
 	map<int, Function> functions;
 	
 public:
@@ -14,4 +15,8 @@ public:
 	void initCFG(istream &is);
 	void genSCR();
 	void printCFG();
+
+	void genSCP();
+	void reportSCP();
+	void runSCP();
 };

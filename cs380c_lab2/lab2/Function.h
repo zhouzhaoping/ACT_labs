@@ -12,7 +12,11 @@ private:
 	int lastBlock;
 	map<int, Code3addr> codelist;
 	set<int> block;
-	map<int, vector<int> > edges;
+	map<int, vector<int> > edges;	// edges of blocks
+	map<int, vector<int> > edges_jump_from;
+
+	map<string, set<int> > variable_defpos;		// positions of varias def
+	map<int, set<int> > in, out;
 public:
 	Function() {};
 	Function(int n) { funStartLineNumber = n; };
@@ -24,5 +28,7 @@ public:
 	void setEnd(int n) { funEndLineNumber = n; };
 	void printCFG();
 	void print();
+
+	void runSCP();
 };
 
