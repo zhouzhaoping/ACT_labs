@@ -19,4 +19,6 @@ public:
 	void genSCP();
 	void reportSCP();
 	void runSCP();
+
+	void printCode3Addr();
 };

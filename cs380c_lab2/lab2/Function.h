@@ -17,6 +17,7 @@ private:
 
 	map<string, set<int> > variable_defpos;		// positions of varias def
 	map<int, set<int> > in, out;
+
 public:
 	Function() {};
 	Function(int n) { funStartLineNumber = n; };
@@ -30,5 +31,9 @@ public:
 	void print();
 
 	void runSCP();
+	void makeInOut_SCP();
+	bool defValueChange_SCP(int &count);
+
+	void printCode3Addr();
 };
 

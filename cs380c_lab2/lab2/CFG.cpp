@@ -1,5 +1,6 @@
 #include "CFG.h"
 #include "Graph.h"
+#include "tools.h"
 using namespace std;
 
 void CFG::initCFG(istream &is)
@@ -82,4 +83,17 @@ void CFG::runSCP()
 		//it->second.printCFG();
 		//it->second.genSCR();
 	}
+}
+
+void CFG::printCode3Addr()
+{
+	toCode3Addr("nop");
+	for (map<int, Function>::iterator it = functions.begin(); it != functions.end(); ++it)
+	{
+		if (it->first == mainFun)
+			toCode3Addr("entrypc");
+		it->second.printCode3Addr();
+		//it->second.genSCR();
+	}
+	toCode3Addr("nop");
 }

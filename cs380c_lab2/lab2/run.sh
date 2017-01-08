@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+THREE_ADDR_TO_C_TRANSLATOR=../../cs380c_lab1/lab1/run.sh
+
 opt=0
 for option in $*
 do
@@ -14,7 +16,7 @@ do
 			../../cs380c_lab1/lab1/run.sh
 		    elif [ $opt = 11 ]
 		    then
-			./cfg_scp_3addr | ./convert
+			$(cd `dirname $0`; pwd)/SCP_gen | ${THREE_ADDR_TO_C_TRANSLATOR}
 		    elif [ $opt = 12 ]
 		    then
 			./cfg_dse_3addr | ./convert

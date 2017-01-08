@@ -23,9 +23,10 @@ void GCD(long a)
 
 void main()
 {
+	long c;
   a = 25733;
   b = 48611;
-  GCD(b);
+  GCD(c);
 
   a = 7485671;
   GCD(b);

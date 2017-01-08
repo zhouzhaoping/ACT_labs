@@ -30,26 +30,38 @@ Code3addr::Code3addr(string str)
 	else
 		branch = call = -1;
 
-	def = "";
+	def = defValue = "";
+
 	// gen use and def
-	if (codesplit[0] == "move" || codesplit[0] == "store")
+	// include line temp value, ignore global/array/struct
+	if (codesplit[0] == "move")
 	{
-		if (codesplit[1].find("#") != string::npos)
-		{
-			use.insert(split(codesplit[1], "#")[0]);
-		}
-		if (codesplit[2].find("#") != string::npos)
-			def = split(codesplit[2], "#")[0];
+		if (isVariable(codesplit[1]) || codesplit[1].find("(") != string::npos)
+			use.insert(codesplit[1]);
+		if (isnum(codesplit[1]))
+			defValue = codesplit[1];
+		if (isVariable(codesplit[2]))
+			def = codesplit[2];
 	}
 	else
 	{
+		int preoptFlag = true;
 		for (int i = 1; i < codesplit.size(); ++i)
 		{
-			string arg = split(codesplit[i], "#")[0];
-			if (codesplit[i].find("#") != string::npos && arg.find("_base") == string::npos)//ignore global
+			if (isVariable(codesplit[i]) || codesplit[i].find("(") != string::npos)
 			{
-				use.insert(arg);
+				use.insert(codesplit[i]);
 			}
+			if (preoptFlag && !isnum(codesplit[i]))
+				preoptFlag = false;
+		}
+		if (isArithmeticOperations(codesplit[0]) && preoptFlag)
+		{
+			
+			if (codesplit.size() < 3)
+				defValue = int2string(preOpt(codesplit[0], codesplit[1]));
+			else
+				defValue = int2string(preOpt(codesplit[0], codesplit[1], codesplit[2]));
 		}
 	}
 }
@@ -57,12 +69,12 @@ Code3addr::Code3addr(string str)
 void Code3addr::print()
 {
 	cout << lineNumber << ":" << code << endl;
-	/*cout << "split:";
+	cout << "split:";
 	for (vector<string>::iterator str = codesplit.begin(); str != codesplit.end(); ++str)
 	{
 		cout << "|" << *str;
 	}
-	cout << endl;*/
+	cout << "|" << endl;
 	//cout << "lineNumber:" << lineNumber << endl;
 	if (branch != -1) cout << "branch:" << branch << endl;
 	if (call != -1) cout << "call:" << call << endl;
@@ -71,6 +83,7 @@ void Code3addr::print()
 	if (isblockhead) cout << "is BlockHead!" << endl;
 	if (isblocktail) cout << "is BlockTail!" << endl;
 	if (def != "") cout << "Def:" << def << endl;
+	if (defValue != "") cout << "DefValue:|" << defValue << "|" << endl;
 	if (!use.empty())
 	{
 		cout << "Use:";
@@ -81,3 +94,22 @@ void Code3addr::print()
 		cout << endl;
 	}
 }
+
+void Code3addr::update(map<string, string> use2value)
+{
+	if (codesplit[0] == "move")//or store?
+	{
+		defValue = codesplit[1] = getValue(codesplit[1], use2value);
+	}
+	else if (isArithmeticOperations(codesplit[0]))
+	{
+		string v1 = "-1", v2 = "-1";
+		v1 = getValue(codesplit[1], use2value);
+		if (codesplit[0] != "neg")
+		{
+			v2 = getValue(codesplit[2], use2value);
+		}
+		if (v1 != "" && v2 != "")
+			defValue = int2string(preOpt(codesplit[0], v1, v2));
+	}
+};

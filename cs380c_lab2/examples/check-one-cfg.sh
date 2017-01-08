@@ -12,6 +12,4 @@ BASENAME=`basename $PROGRAM .c`
 echo $PROGRAM
 ${C_SUBSET_COMPILER} $PROGRAM > ${BASENAME}.3addr
 ${THREE_ADDR_TO_C_TRANSLATOR} -backend=cfg < ${BASENAME}.3addr > ${BASENAME}.cfg
-rm ${BASENAME}.3addr
 md5sum ${BASENAME}.cfg ${BASENAME}.ta.cfg
-rm ${BASENAME}.cfg

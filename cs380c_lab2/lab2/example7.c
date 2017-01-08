@@ -6,12 +6,17 @@
 #define long long long
 
 
-void main()
+void dd()
 {
 				long a;
 				long b;
-				a = 3;
+				a = 3 + (-1) + (7 - 6) + (8/9);
 				b = a;
+}
+
+void main()
+{
+				dd();
 }
 
 /*

@@ -76,7 +76,7 @@ void Function::print()
 		cout << endl;
 	}
 
-	cout << "Function: " << funStartLineNumber << endl;
+	/*cout << "Function: " << funStartLineNumber << endl;
 	cout << "Basic blocks: ";
 	for (set<int>::iterator i = block.begin(); i != block.end(); ++i)
 		cout << *i << " ";
@@ -99,7 +99,7 @@ void Function::print()
 			cout << *i << " ";
 		}
 		cout << endl;
-	}
+	}*/
 }
 
 void Function::printCFG()
@@ -164,6 +164,18 @@ void Function::genSCR()
 
 void Function::runSCP()
 {
+	makeInOut_SCP();
+	int count = 0;
+	//print();
+	//cout << "Function: " << funStartLineNumber << endl;
+	while (defValueChange_SCP(count));
+		//print();
+	//print();
+	//cout << "Number of constants propagated: " << count << endl;
+}
+
+void Function::makeInOut_SCP()
+{
 	in.clear();
 	out.clear();
 	for (int i = funStartLineNumber; i != funEndLineNumber + 1; ++i)
@@ -179,6 +191,7 @@ void Function::runSCP()
 		{
 			if (codelist[i].isBlockHead())
 			{
+				// union
 				in[i].clear();
 				for (vector<int>::iterator it_from = edges_jump_from[i].begin(); it_from != edges_jump_from[i].end(); ++it_from)
 				{
@@ -211,44 +224,84 @@ void Function::runSCP()
 			}
 		}
 	}
-
-	int count = 0;
-	cout << "Function: " << funStartLineNumber << endl;
+}
+bool Function::defValueChange_SCP(int &count)
+{
+	bool defValChange = false;
 	for (int i = funStartLineNumber; i != funEndLineNumber + 1; ++i)
 	{
-		codelist[i].print();
-		if (!codelist[i].getUse().empty() && !in[i].empty())
+		//codelist[i].print();
+		if (!codelist[i].getUse().empty() && codelist[i].getDefValue() == "")
 		{
+			bool variausechange = false;
+			map<string, string> tempuse2value;
 			set<string> uselist = codelist[i].getUse();
 			for (set<string>::iterator name = uselist.begin(); name != uselist.end(); ++name)
 			{
 				//cout << "name = " << *name << endl;
-				bool isConst = true;
-				string value = "";
-				for (set<int>::iterator defpos = in[i].begin(); defpos != in[i].end(); ++defpos)
+
+				string namevalue = *name;
+				if (namevalue[0] == '(')
 				{
-					//cout << "find in line:" << *defpos << endl;
-					if (codelist[*defpos].getDef() == *name)
+					int defline = atoi(namevalue.substr(1, namevalue.length() - 2).c_str());
+					if (codelist[defline].getDefValue() != "")
 					{
-						if (value == "")
-						{
-							value = codelist[*defpos].getCodesplit()[1];
-						}
-						else if (value != codelist[*defpos].getCodesplit()[1])
-						{
-							isConst = false;
-						}
+						tempuse2value[*name] = codelist[defline].getDefValue();
 					}
-					if (!isConst)
-						break;
 				}
-				if (isConst && isnum(value))
+				else
 				{
-					cout << "in line " << i << ":" << *name << " = " << value << endl;
-					++count;
+					bool isConst = true;
+					string value = "";
+					for (set<int>::iterator defpos = in[i].begin(); defpos != in[i].end(); ++defpos)
+					{
+						//cout << "find in line:" << *defpos << endl;
+						if (codelist[*defpos].getDef() == *name)
+						{
+							if (codelist[*defpos].getDefValue() == "")
+							{
+								isConst = false;
+							}
+							if (value == "")
+							{
+								value = codelist[*defpos].getDefValue();
+							}
+							else if (value != codelist[*defpos].getDefValue())
+							{
+								isConst = false;
+							}
+						}
+						if (!isConst)
+							break;
+					}
+					if (isConst && value != "")
+					{
+						//use2value[*name] = value;
+						codelist[i].setCodesplit(*name, value);
+						//cout << "in line " << i << ":" << *name << " = " << value << endl;
+						++count;
+						variausechange = true;
+					}
 				}
+			}
+			if (tempuse2value.size() != 0 || variausechange)
+			{
+				//cout << "update!!!!!" << endl;
+				codelist[i].update(tempuse2value);
+				if (codelist[i].getDefValue() != "")
+					defValChange = true;
+				//codelist[i].print();
 			}
 		}
 	}
-	cout << "Number of constants propagated: " << count << endl;
+	return defValChange;
+}
+
+void Function::printCode3Addr()
+{
+	for (map<int, Code3addr>::iterator itr = codelist.begin(); itr != codelist.end(); ++itr)
+	{
+		vector<string> v = itr->second.getCodesplit();
+		toCode3Addr(v);
+	}
 }
