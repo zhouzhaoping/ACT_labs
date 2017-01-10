@@ -17,6 +17,35 @@ void Function::addEdge(int from, int to)
 	edges_jump_from[to].push_back(from);
 }
 
+void Function::removeEdge(int from, int to)
+{
+	int blockpos = from;
+	while (!codelist[blockpos].isBlockHead())
+		--blockpos;
+
+	edges[blockpos].erase(find(edges[blockpos].begin(), edges[blockpos].end(), to));
+	if (edges[blockpos].empty())
+		edges.erase(edges.find(blockpos));
+
+	edges_jump_from[to].erase(find(edges_jump_from[to].begin(), edges_jump_from[to].end(), from));
+	// if block can not be reach, it can release
+	releaseUnreachable(to);
+}
+
+void Function::releaseUnreachable(int from)
+{
+	cerr << "hehe" << from << endl;
+	if (edges.find(from) != edges.end() && edges_jump_from[from].empty())
+	{
+		for (vector<int>::iterator itr = edges[from].begin(); itr != edges[from].end(); ++itr)
+		{
+			vector<int>::iterator i = find(edges_jump_from[*itr].begin(), edges_jump_from[*itr].end(), from);
+			if (i != edges_jump_from[*itr].end())
+				edges_jump_from[*itr].erase(i);
+			releaseUnreachable(*itr);
+		}
+	}
+}
 void Function::addCode(Code3addr c3a)
 {
 	codelist[c3a.getlineNumber()] = c3a;
@@ -80,6 +109,7 @@ void Function::print()
 	cout << "Basic blocks: ";
 	for (set<int>::iterator i = block.begin(); i != block.end(); ++i)
 		cout << *i << " ";
+	*/
 	cout << endl << "jump from:" << endl;
 	for (map<int, vector<int> >::iterator it = edges_jump_from.begin(); it != edges_jump_from.end(); ++it)
 	{
@@ -91,7 +121,7 @@ void Function::print()
 		cout << endl;
 	}
 
-	for (map<string, set<int> >::iterator it = variable_defpos.begin(); it != variable_defpos.end(); ++it)
+	/*for (map<string, set<int> >::iterator it = variable_defpos.begin(); it != variable_defpos.end(); ++it)
 	{
 		cout << it->first << " def in : ";
 		for (set<int>::iterator i = it->second.begin(); i != it->second.end(); ++i)
@@ -165,13 +195,19 @@ void Function::genSCR()
 void Function::runSCP()
 {
 	makeInOut_SCP();
-	int count = 0;
+	propagationCount = 0;
 	//print();
-	//cout << "Function: " << funStartLineNumber << endl;
-	while (defValueChange_SCP(count));
-		//print();
+	vector<int> branchChange;
+	while (defValueChange_SCP(branchChange))
+	{
+		if (!branchChange.empty())
+		{
+			preBranch_SCP(branchChange);
+			branchChange.clear();
+			makeInOut_SCP();
+		}
+	}
 	//print();
-	//cout << "Number of constants propagated: " << count << endl;
 }
 
 void Function::makeInOut_SCP()
@@ -225,7 +261,7 @@ void Function::makeInOut_SCP()
 		}
 	}
 }
-bool Function::defValueChange_SCP(int &count)
+bool Function::defValueChange_SCP(vector<int> &branchChange)
 {
 	bool defValChange = false;
 	for (int i = funStartLineNumber; i != funEndLineNumber + 1; ++i)
@@ -233,7 +269,6 @@ bool Function::defValueChange_SCP(int &count)
 		//codelist[i].print();
 		if (!codelist[i].getUse().empty() && codelist[i].getDefValue() == "")
 		{
-			bool variausechange = false;
 			map<string, string> tempuse2value;
 			set<string> uselist = codelist[i].getUse();
 			for (set<string>::iterator name = uselist.begin(); name != uselist.end(); ++name)
@@ -245,8 +280,13 @@ bool Function::defValueChange_SCP(int &count)
 				{
 					int defline = atoi(namevalue.substr(1, namevalue.length() - 2).c_str());
 					if (codelist[defline].getDefValue() != "")
-					{
-						tempuse2value[*name] = codelist[defline].getDefValue();
+					{	
+						if (codelist[i].getCodesplit()[0] == "move" || codelist[i].getCodesplit()[0].substr(0, 3) == "cmp")
+						{
+							codelist[i].setCodesplit(*name, codelist[defline].getDefValue());
+						}
+						else
+							tempuse2value[*name] = codelist[defline].getDefValue();
 					}
 				}
 				else
@@ -278,23 +318,39 @@ bool Function::defValueChange_SCP(int &count)
 					{
 						//use2value[*name] = value;
 						codelist[i].setCodesplit(*name, value);
-						//cout << "in line " << i << ":" << *name << " = " << value << endl;
-						++count;
-						variausechange = true;
+						cerr << "instr " + int2string(i) + ":" + *name  + " = " + value + "\n";
+						++propagationCount;
 					}
 				}
 			}
-			if (tempuse2value.size() != 0 || variausechange)
+
+			if (tempuse2value.size() == codelist[i].getUse().size())// no variable and all temp be const
 			{
-				//cout << "update!!!!!" << endl;
+				//cerr << "update!!!!!" << endl;
 				codelist[i].update(tempuse2value);
 				if (codelist[i].getDefValue() != "")
+				{
+					if (isBranchClearedOrSet(codelist[i].getCodesplit()[0]))
+						branchChange.push_back(i);
 					defValChange = true;
+				}
 				//codelist[i].print();
 			}
 		}
 	}
 	return defValChange;
+}
+void Function::preBranch_SCP(vector<int> &branchChange)
+{
+	cerr << "pre branch:" << endl;
+	for (vector<int>::iterator pos = branchChange.begin(); pos != branchChange.end(); ++pos)
+	{
+		cerr << "instr " << *pos << " :" << codelist[*pos].getDefValue() << endl;
+		if (codelist[*pos].getDefValue() == "1")
+			removeEdge(*pos, *pos + 1);
+		else
+			removeEdge(*pos, codelist[*pos].getBranch());
+	}
 }
 
 void Function::printCode3Addr()
@@ -305,3 +361,4 @@ void Function::printCode3Addr()
 		toCode3Addr(v);
 	}
 }
+

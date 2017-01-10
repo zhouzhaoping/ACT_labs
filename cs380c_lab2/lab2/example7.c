@@ -14,6 +14,39 @@ void dd()
 				b = a;
 }
 
+void hihi(long a, long b)
+{
+				long c;
+				a = 2;
+				b = 1;
+				if (a == b + 1)
+				{
+								c = 1;
+				}
+				else
+				{
+								c = 2;
+				}
+				while (c == 2)
+				{
+								a = a + 1;
+				}
+				if (a == 2)
+				{
+								b = 3;
+				}
+
+}
+void hh()
+{
+				long a;
+				long b;
+				a = 1;
+				b = 2;
+				hihi(a, b);
+				WriteLong(a);
+}
+
 void main()
 {
 				dd();

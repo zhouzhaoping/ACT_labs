@@ -12,11 +12,11 @@ private:
 	
 public:
 	CFG() {};
+	void print();
 	void initCFG(istream &is);
 	void genSCR();
 	void printCFG();
 
-	void genSCP();
 	void reportSCP();
 	void runSCP();
 

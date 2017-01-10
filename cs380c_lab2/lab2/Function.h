@@ -13,10 +13,11 @@ private:
 	map<int, Code3addr> codelist;
 	set<int> block;
 	map<int, vector<int> > edges;	// edges of blocks
-	map<int, vector<int> > edges_jump_from;
+	map<int, vector<int> > edges_jump_from;// blockhead -> jumpfrompos
 
 	map<string, set<int> > variable_defpos;		// positions of varias def
 	map<int, set<int> > in, out;
+	int propagationCount;
 
 public:
 	Function() {};
@@ -24,6 +25,9 @@ public:
 
 	void addCode(Code3addr c3a);
 	void addEdge(int from, int to);
+	void removeEdge(int from, int to);
+	void releaseUnreachable(int to);
+
 	void genCFG();
 	void genSCR();
 	void setEnd(int n) { funEndLineNumber = n; };
@@ -32,7 +36,9 @@ public:
 
 	void runSCP();
 	void makeInOut_SCP();
-	bool defValueChange_SCP(int &count);
+	bool defValueChange_SCP(vector<int> &branchChange);
+	void preBranch_SCP(vector<int> &branchChange);
+	int getPropagationCount() { return propagationCount; }
 
 	void printCode3Addr();
 };

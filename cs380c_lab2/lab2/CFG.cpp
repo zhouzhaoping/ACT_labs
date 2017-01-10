@@ -1,6 +1,7 @@
 #include "CFG.h"
 #include "Graph.h"
 #include "tools.h"
+#include <iostream>
 using namespace std;
 
 void CFG::initCFG(istream &is)
@@ -55,15 +56,7 @@ void CFG::genSCR()
 	for (map<int, Function>::iterator it = functions.begin(); it != functions.end(); ++it)
 	{
 		//it->second.print();
-		it->second.runSCP();
-	}
-}
-
-void CFG::genSCP()
-{
-	for (map<int, Function>::iterator it = functions.begin(); it != functions.end(); ++it)
-	{
-		//it->second.genSCP();
+		it->second.genSCR();
 	}
 }
 
@@ -71,8 +64,8 @@ void CFG::reportSCP()
 {
 	for (map<int, Function>::iterator it = functions.begin(); it != functions.end(); ++it)
 	{
-		//it->second.printCFG();
-		//it->second.genSCR();
+		cout << "Function: " << it->first << endl;
+		cout << "Number of constants propagated: " << it->second.getPropagationCount() << endl;
 	}
 }
 
@@ -80,8 +73,8 @@ void CFG::runSCP()
 {
 	for (map<int, Function>::iterator it = functions.begin(); it != functions.end(); ++it)
 	{
-		//it->second.printCFG();
-		//it->second.genSCR();
+		cerr << "run scp in func" << it->first << endl;
+		it->second.runSCP();
 	}
 }
 
@@ -96,4 +89,12 @@ void CFG::printCode3Addr()
 		//it->second.genSCR();
 	}
 	toCode3Addr("nop");
+}
+
+void CFG::print()
+{
+	for (map<int, Function>::iterator it = functions.begin(); it != functions.end(); ++it)
+	{
+		it->second.print();
+	}
 }

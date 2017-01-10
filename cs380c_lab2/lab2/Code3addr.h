@@ -44,14 +44,14 @@ public:
 		use.erase(use.find(str));
 	};
 
-	void setBlockHead() { isblockhead = true; };
-	void setBlockTail() { isblocktail = true; };
-	bool isBlockHead() { return isblockhead; };
-	bool isBlockTail() { return isblocktail; };
-	string getDef() { return def; };
-	set<string> getUse() { return use; };
+	void setBlockHead() { isblockhead = true; }
+	void setBlockTail() { isblocktail = true; }
+	bool isBlockHead() { return isblockhead; }
+	bool isBlockTail() { return isblocktail; }
+	string getDef() { return def; }
+	set<string> getUse() { return use; }
 	string getDefValue() { return defValue; }
-	string setDefValue(string str) { return defValue = str; };
+	string setDefValue(string str) { return defValue = str; }
 
 	void update(map<string, string> use2value);
 };

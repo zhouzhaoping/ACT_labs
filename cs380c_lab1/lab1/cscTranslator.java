@@ -49,7 +49,7 @@ public class cscTranslator
 		StringBuilder pgm = new StringBuilder();
 		pgm.append("#include <stdio.h>\n");
 		pgm.append("#define WriteLine() printf(\"\\n\");\n");
-		pgm.append("#define WriteLong(x) printf(\" %lld\", x);\n");
+		pgm.append("#define WriteLong(x) printf(\" %lld\", (long)x);\n");// fix
 		pgm.append("#define ReadLong(a) if (fscanf(stdin, \"%lld\", &a) != 1) a = 0;\n");
 		pgm.append("#define long long long\n");
 		pgm.append("\n\n\n");

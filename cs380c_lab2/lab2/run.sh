@@ -16,7 +16,7 @@ do
 			../../cs380c_lab1/lab1/run.sh
 		    elif [ $opt = 11 ]
 		    then
-			$(cd `dirname $0`; pwd)/SCP_gen | ${THREE_ADDR_TO_C_TRANSLATOR}
+			$(cd `dirname $0`; pwd)/SCP_gen 3addr | ${THREE_ADDR_TO_C_TRANSLATOR}
 		    elif [ $opt = 12 ]
 		    then
 			./cfg_dse_3addr | ./convert
@@ -28,19 +28,19 @@ do
 			$(cd `dirname $0`; pwd)/CFG_gen
 		    elif [ $opt = 11 ]
 		    then
-			./cfg_scp_3addr | ./cfg_cfg
+			$(cd `dirname $0`; pwd)/SCP_gen cfg
 		    elif [ $opt = 12 ]
 		    then
 			./cfg_dse_3addr | ./cfg_cfg
 		    fi
 		elif [ $value = "3addr" ]
 		then
-	            if [ $opt = 0 ]
+	      if [ $opt = 0 ]
 		    then
 			echo 1
 		    elif [ $opt = 11 ]
 		    then
-			./cfg_scp_3addr
+			$(cd `dirname $0`; pwd)/SCP_gen 3addr
 		    elif [ $opt = 12 ]
 		    then
 			./cfg_dce_3addr
@@ -52,7 +52,7 @@ do
 			echo 1
 		    elif [ $opt = 11 ]
 		    then
-			./cfg_scp_rep
+			 $(cd `dirname $0`; pwd)/SCP_gen rep
 		    elif [ $opt = 12 ]
 		    then
 			./cfg_dce_rep

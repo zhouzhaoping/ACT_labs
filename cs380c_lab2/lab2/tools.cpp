@@ -64,6 +64,12 @@ bool isArithmeticOperations(string optname)
 	return false;
 }
 
+bool isBranchClearedOrSet(string optname)
+{
+	if (optname == "blbc" || optname == "blbs")
+		return true;
+}
+
 int preOpt(string opt, string val1, string val2)
 {
 	int v1 = atoi(val1.c_str()), v2 = atoi(val2.c_str());
@@ -85,6 +91,10 @@ int preOpt(string opt, string val1, string val2)
 		return (v1 <= v2) ? 1 : 0;
 	else if (opt == "cmplt")
 		return (v1 < v2) ? 1 : 0;
+	else if (opt == "blbc")
+		return (v1 == 0) ? 1 : 0;
+	else if (opt == "blbs")
+		return (v1 == 0) ? 0 : 1;
 	return 0;//
 }
 
@@ -105,7 +115,7 @@ string getValue(string &name, map<string, string> &use2value)
 	{
 		return name;
 	}
-	return "";
+	return "";//error
 }
 
 void toCode3Addr(const string &cmd)

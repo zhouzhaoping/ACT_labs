@@ -17,6 +17,7 @@ Code3addr::Code3addr(string str)
 
 	isblockhead = isblocktail = false;
 
+	branch = call = -1;
 	if (codesplit[0] == "br" || codesplit[0] == "blbc" || codesplit[0] == "blbs")
 	{
 		string last = *codesplit.rbegin();
@@ -27,8 +28,7 @@ Code3addr::Code3addr(string str)
 		string last = *codesplit.rbegin();
 		call = atoi(last.substr(1, last.length() - 2).c_str());
 	}
-	else
-		branch = call = -1;
+		
 
 	def = defValue = "";
 
@@ -99,7 +99,7 @@ void Code3addr::update(map<string, string> use2value)
 {
 	if (codesplit[0] == "move")//or store?
 	{
-		defValue = codesplit[1] = getValue(codesplit[1], use2value);
+		defValue =  getValue(codesplit[1], use2value);
 	}
 	else if (isArithmeticOperations(codesplit[0]))
 	{
@@ -110,6 +110,14 @@ void Code3addr::update(map<string, string> use2value)
 			v2 = getValue(codesplit[2], use2value);
 		}
 		if (v1 != "" && v2 != "")
+		{
 			defValue = int2string(preOpt(codesplit[0], v1, v2));
+		}
+	}
+	else if (isBranchClearedOrSet(codesplit[0]))
+	{
+		string v1 = getValue(codesplit[1], use2value);
+		if (v1 != "")
+			defValue = int2string(preOpt(codesplit[0], v1));
 	}
 };

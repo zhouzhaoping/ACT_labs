@@ -14,6 +14,7 @@ bool isnum(string s);
 bool isVariable(string name);
 
 bool isArithmeticOperations(string optname);
+bool isBranchClearedOrSet(string optname);
 
 int preOpt(string opt, string val1, string val2 = "-1");
 

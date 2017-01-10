@@ -18,4 +18,9 @@ ${THREE_ADDR_TO_C_TRANSLATOR} -opt=scp -backend=c < ${BASENAME}.3addr > ${BASENA
 gcc ${BASENAME}.3addr.c -o ${BASENAME}.3addr.bin
 ./${BASENAME}.gcc.bin > ${BASENAME}.gcc.txt
 ./${BASENAME}.3addr.bin > ${BASENAME}.3addr.txt
+#diff ${BASENAME}.c ${BASENAME}.3addr.c
+
+${THREE_ADDR_TO_C_TRANSLATOR} -opt=scp -backend=3addr < ${BASENAME}.3addr > ${BASENAME}.3addr.scp
+${THREE_ADDR_TO_C_TRANSLATOR} -opt=scp -backend=rep < ${BASENAME}.3addr > ${BASENAME}.3addr.rep
+
 md5sum ${BASENAME}.gcc.txt ${BASENAME}.3addr.txt
