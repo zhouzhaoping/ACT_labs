@@ -14,11 +14,15 @@ public:
 	CFG() {};
 	void print();
 	void initCFG(istream &is);
-	void genSCR();
+	void genSCR(ostream &os);
 	void printCFG();
 
 	void reportSCP();
 	void runSCP();
+
+
+	void runDSE();
+	void reportDSE();
 
 	void printCode3Addr();
 };

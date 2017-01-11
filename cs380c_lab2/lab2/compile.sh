@@ -14,7 +14,7 @@ cp ~/projects/Project1/Graph.h Graph.h
 cp ~/projects/Project1/Graph.cpp Graph.cpp
 cp ~/projects/Project1/SCR_main.cpp SCR_main.cpp
 cp ~/projects/Project1/SCP_main.cpp SCP_main.cpp
-
+cp ~/projects/Project1/DSE_main.cpp DSE_main.cpp
 
 #g++ SCR_main.cpp Graph.cpp CFG.cpp -o SCR_gen
 
@@ -22,4 +22,5 @@ g++ -c *.cpp
 g++ CFG_main.o CFG.o Function.o Code3addr.o Graph.o tools.o -o CFG_gen
 g++ SCR_main.o CFG.o Function.o Code3addr.o Graph.o tools.o -o SCR_gen
 g++ SCP_main.o CFG.o Function.o Code3addr.o Graph.o tools.o -o SCP_gen
+g++ DSE_main.o CFG.o Function.o Code3addr.o Graph.o tools.o -o DSE_gen
 rm *.o

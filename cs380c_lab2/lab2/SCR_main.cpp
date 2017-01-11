@@ -5,6 +5,6 @@ int main()
 {
 	CFG cfg = CFG();
 	cfg.initCFG(cin);
-	cfg.genSCR();
+	cfg.genSCR(cout);
 	return 0;
 }

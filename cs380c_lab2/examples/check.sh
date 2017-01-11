@@ -11,11 +11,20 @@ done
 echo "md5sum hash of outputs"
 md5sum *.cfg
 
-echo "check scp....."
+echo "check simple constant propagation....."
 for PROGRAM in collatz.c gcd.c hanoifibfac.c loop.c mmm.c prime.c \
     regslarge.c struct.c sort.c sieve.c
 do
-    ./check-one.sh ${PROGRAM}
+    ./check-one-scp.sh ${PROGRAM}
+done
+echo "md5sum hash of outputs"
+md5sum *.txt
+
+echo "check dead statement elimination"
+for PROGRAM in collatz.c gcd.c hanoifibfac.c loop.c mmm.c prime.c \
+    regslarge.c struct.c sort.c sieve.c
+do
+    ./check-one-dse.sh ${PROGRAM}
 done
 echo "md5sum hash of outputs"
 md5sum *.txt

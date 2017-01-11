@@ -10,7 +10,6 @@ void CFG::initCFG(istream &is)
 	Function curFunction(-1);
 	int curFunctionLineNumeber = -1;
 	bool nextMain = false;
-
 	while (getline(is, buf))
 	{
 		//cout << "input:" << buf << endl;
@@ -51,12 +50,12 @@ void CFG::printCFG()
 	}
 }
 
-void CFG::genSCR()
+void CFG::genSCR(ostream &os)
 {
 	for (map<int, Function>::iterator it = functions.begin(); it != functions.end(); ++it)
 	{
 		//it->second.print();
-		it->second.genSCR();
+		it->second.genSCR(os);
 	}
 }
 
@@ -73,11 +72,29 @@ void CFG::runSCP()
 {
 	for (map<int, Function>::iterator it = functions.begin(); it != functions.end(); ++it)
 	{
-		cerr << "run scp in func" << it->first << endl;
+		//cerr << "run scp in func" << it->first << endl;
 		it->second.runSCP();
 	}
 }
 
+void CFG::reportDSE()
+{
+	for (map<int, Function>::iterator it = functions.begin(); it != functions.end(); ++it)
+	{
+		cout << "Function: " << it->first << endl;
+		cout << "Number of statements eliminated in SCR: " << it->second.getDseInSCR() << endl;
+		cout << "Number of statements eliminated not in SCR : " << it->second.getDseOutSCR() << endl;
+	}
+}
+
+void CFG::runDSE()
+{
+	for (map<int, Function>::iterator it = functions.begin(); it != functions.end(); ++it)
+	{
+		//cerr << "run scp in func" << it->first << endl;
+		it->second.runDSE();
+	}
+}
 void CFG::printCode3Addr()
 {
 	toCode3Addr("nop");

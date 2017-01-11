@@ -15,6 +15,10 @@ void Function::addEdge(int from, int to)
 	if (edges_jump_from.find(to) == edges_jump_from.end())
 		edges_jump_from[to] = vector<int>();
 	edges_jump_from[to].push_back(from);
+
+	if (edges_jump_to.find(from) == edges_jump_to.end())
+		edges_jump_to[from] = vector<int>();
+	edges_jump_to[from].push_back(to);
 }
 
 void Function::removeEdge(int from, int to)
@@ -34,7 +38,7 @@ void Function::removeEdge(int from, int to)
 
 void Function::releaseUnreachable(int from)
 {
-	cerr << "hehe" << from << endl;
+	//cerr << "hehe" << from << endl;
 	if (edges.find(from) != edges.end() && edges_jump_from[from].empty())
 	{
 		for (vector<int>::iterator itr = edges[from].begin(); itr != edges[from].end(); ++itr)
@@ -109,7 +113,7 @@ void Function::print()
 	cout << "Basic blocks: ";
 	for (set<int>::iterator i = block.begin(); i != block.end(); ++i)
 		cout << *i << " ";
-	*/
+
 	cout << endl << "jump from:" << endl;
 	for (map<int, vector<int> >::iterator it = edges_jump_from.begin(); it != edges_jump_from.end(); ++it)
 	{
@@ -120,7 +124,7 @@ void Function::print()
 		}
 		cout << endl;
 	}
-
+	*/
 	/*for (map<string, set<int> >::iterator it = variable_defpos.begin(); it != variable_defpos.end(); ++it)
 	{
 		cout << it->first << " def in : ";
@@ -154,7 +158,7 @@ void Function::printCFG()
 	cout << lastBlock << " ->" << endl;
 }
 
-void Function::genSCR()
+void Function::genSCR(ostream &os)
 {
 	Graph g(block.size());
 	map<int, int> block2node;
@@ -177,7 +181,7 @@ void Function::genSCR()
 	}
 
 	g.getStrongConnected();
-	cout << "SCR:" << endl;
+	os << "SCR:" << endl;
 	for (vector<vector<int> >::iterator i = Graph::result.begin(); i != Graph::result.end(); ++i)
 	{
 		if (i->size() > 1)
@@ -185,9 +189,10 @@ void Function::genSCR()
 			sort(i->begin(), i->end(), less<int>());
 			for (vector<int>::iterator j = i->begin(); j != i->end(); ++j)
 			{
-				cout << node2block[*j] << " ";
+				os << node2block[*j] << " ";
+				scrblock.insert(node2block[*j]);
 			}
-			cout << endl;
+			os << endl;
 		}
 	}
 }
@@ -209,7 +214,6 @@ void Function::runSCP()
 	}
 	//print();
 }
-
 void Function::makeInOut_SCP()
 {
 	in.clear();
@@ -318,7 +322,7 @@ bool Function::defValueChange_SCP(vector<int> &branchChange)
 					{
 						//use2value[*name] = value;
 						codelist[i].setCodesplit(*name, value);
-						cerr << "instr " + int2string(i) + ":" + *name  + " = " + value + "\n";
+						//cerr << "instr " + int2string(i) + ":" + *name  + " = " + value + "\n";
 						++propagationCount;
 					}
 				}
@@ -342,14 +346,123 @@ bool Function::defValueChange_SCP(vector<int> &branchChange)
 }
 void Function::preBranch_SCP(vector<int> &branchChange)
 {
-	cerr << "pre branch:" << endl;
+	//cerr << "pre branch:" << endl;
 	for (vector<int>::iterator pos = branchChange.begin(); pos != branchChange.end(); ++pos)
 	{
-		cerr << "instr " << *pos << " :" << codelist[*pos].getDefValue() << endl;
+		//cerr << "instr " << *pos << " :" << codelist[*pos].getDefValue() << endl;
 		if (codelist[*pos].getDefValue() == "1")
 			removeEdge(*pos, *pos + 1);
 		else
 			removeEdge(*pos, codelist[*pos].getBranch());
+	}
+}
+
+void Function::runDSE()
+{
+	//cout << "run dse" << endl;
+	makeInOut_DSE();
+	//cout << "make in out" << endl;
+	dseInSCR = dseOutSCR = 0;
+	//cout << "make sum" << endl;
+	while (deadStatementChange_DSE())
+		makeInOut_DSE();
+}
+
+bool Function::deadStatementChange_DSE()
+{
+	bool change = false;
+
+	set<string> livesum;
+	for (int i = funStartLineNumber; i != funEndLineNumber + 1; ++i)
+	{
+		for (set<string>::iterator itr = in_string[i].begin(); itr != in_string[i].end(); ++itr)
+		{
+			livesum.insert(*itr);
+		}
+	}
+
+	bool isScr = false;
+	for (int i = funStartLineNumber; i != funEndLineNumber + 1; ++i)
+	{
+		if (codelist[i].isBlockHead())
+		{
+			if (scrblock.find(i) == scrblock.end())
+				isScr = false;
+			else
+				isScr = true;
+		}
+		string defname = codelist[i].getDef();
+		if (defname != "" && livesum.find(defname) == livesum.end())
+		{
+			change = true;
+			cerr << "line " << i << " : " << defname << " is not live" << endl;
+			codelist[i] = Code3addr("    instr 123: add 123 123");// set nop
+			//codelist[i].print();
+			if (isScr)
+				++dseInSCR;
+			else
+				++dseOutSCR;
+		}
+	}
+	return change;
+}
+
+void Function::makeInOut_DSE()
+{
+	in_string.clear();
+	out_string.clear();
+	for (int i = funStartLineNumber; i != funEndLineNumber + 1; ++i)
+	{
+		in_string[i] = out_string[i] = set<string>();
+	}
+
+	bool change = true;
+	while (change)
+	{
+		change = false;
+		for (int i = funEndLineNumber - 1; i != funStartLineNumber; --i)
+		{
+			//codelist[i].print();
+			if (codelist[i].isBlockTail())
+			{
+				// union
+				out_string[i].clear();
+				for (vector<int>::iterator it_to = edges_jump_to[i].begin(); it_to != edges_jump_to[i].end(); ++it_to)
+				{
+					for (set<string>::iterator it_to_ele = in_string[*it_to].begin(); it_to_ele != in_string[*it_to].end(); ++it_to_ele)
+					{
+						out_string[i].insert(*it_to_ele);
+					}
+				}
+			}
+			else
+				out_string[i] = in_string[i + 1];
+
+			set<string> in_old = in_string[i];
+			in_string[i] = out_string[i];
+
+			string defname = codelist[i].getDef();
+			if (defname != "" && in_string[i].find(defname) != in_string[i].end())
+				in_string[i].erase(in_string[i].find(defname));
+			/*defname = "[" + int2string(i) + "]";
+			if (in_string[i].find(defname) != in_string[i].end())
+				in_string[i].erase(in_string[i].find(defname));*/
+
+			set<string> uselist = codelist[i].getUse();
+			for (set<string>::iterator itr = uselist.begin(); itr != uselist.end(); ++itr)
+			{
+				if ((*itr)[0] != '(')
+					in_string[i].insert(*itr);
+			}
+
+			if (!change)
+			{
+				set<string> temp;
+				set_symmetric_difference(in_old.begin(), in_old.end(), in_string[i].begin(), in_string[i].end(), inserter(temp, temp.begin()));
+				if (!temp.empty())
+					change = true;
+			}
+		}
 	}
 }
 

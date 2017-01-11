@@ -21,7 +21,7 @@ private:
 	set<string> use;
 	string defValue;
 public:
-	Code3addr() {};
+	Code3addr() { codesplit.push_back("nop"); };
 	Code3addr(string str);
 	void print();
 

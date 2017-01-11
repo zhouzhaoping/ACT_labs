@@ -19,7 +19,7 @@ do
 			$(cd `dirname $0`; pwd)/SCP_gen 3addr | ${THREE_ADDR_TO_C_TRANSLATOR}
 		    elif [ $opt = 12 ]
 		    then
-			./cfg_dse_3addr | ./convert
+			$(cd `dirname $0`; pwd)/DSE_gen 3addr | ${THREE_ADDR_TO_C_TRANSLATOR}
 		    fi
 		elif [ $value = "cfg" ]
 		then
@@ -31,7 +31,7 @@ do
 			$(cd `dirname $0`; pwd)/SCP_gen cfg
 		    elif [ $opt = 12 ]
 		    then
-			./cfg_dse_3addr | ./cfg_cfg
+			$(cd `dirname $0`; pwd)/DSE_gen cfg
 		    fi
 		elif [ $value = "3addr" ]
 		then
@@ -43,7 +43,7 @@ do
 			$(cd `dirname $0`; pwd)/SCP_gen 3addr
 		    elif [ $opt = 12 ]
 		    then
-			./cfg_dce_3addr
+			$(cd `dirname $0`; pwd)/DSE_gen 3addr
 		    fi
 		elif [ $value = "rep" ]
 		then
@@ -52,10 +52,10 @@ do
 			echo 1
 		    elif [ $opt = 11 ]
 		    then
-			 $(cd `dirname $0`; pwd)/SCP_gen rep
+			$(cd `dirname $0`; pwd)/SCP_gen rep
 		    elif [ $opt = 12 ]
 		    then
-			./cfg_dce_rep
+			$(cd `dirname $0`; pwd)/DSE_gen rep
 		    fi
 		fi
 	elif [ $argument = "opt" ]
