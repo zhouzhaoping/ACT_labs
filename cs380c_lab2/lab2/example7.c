@@ -31,10 +31,6 @@ void hihi(long a, long b)
 				{
 								a = a + 1;
 				}
-				if (a == 2)
-				{
-								b = 3;
-				}
 
 }
 void hh()
